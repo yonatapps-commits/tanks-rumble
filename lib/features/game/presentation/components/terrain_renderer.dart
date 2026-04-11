@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:tanks_rumble/core/constants/game_constants.dart';
@@ -6,11 +8,11 @@ import 'package:tanks_rumble/core/constants/game_constants.dart';
 /// Tiled map is used only for data (spawn points, collision).
 class TerrainRenderer extends PositionComponent {
   final double groundY;
-  final List<MountainLayer> mountainLayers;
+  final List<Offset> mountainVertices;
 
   TerrainRenderer({
     required this.groundY,
-    required this.mountainLayers,
+    required this.mountainVertices,
   }) : super(
           position: Vector2.zero(),
           size: Vector2(GameConstants.worldWidth, GameConstants.worldHeight),
@@ -18,24 +20,22 @@ class TerrainRenderer extends PositionComponent {
 
   /// Creates the default arena terrain.
   factory TerrainRenderer.arena() {
-    const groundRow = 26;
-    const groundY = groundRow * 32.0;
+    const groundY = 26 * 32.0; // row 26 = ground start
 
-    // Mountain trapezoid layers (narrowing toward top)
-    final layers = <MountainLayer>[];
-    for (var row = 0; row < 8; row++) {
-      final shrink = (7 - row) ~/ 2;
-      final mLeft = (27 + shrink) * 32.0;
-      final mRight = (33 - shrink + 1) * 32.0;
-      final y = (18 + row) * 32.0;
-      layers.add(MountainLayer(
-        rect: Rect.fromLTRB(mLeft, y, mRight, y + 32),
-      ));
-    }
+    // Smooth triangle mountain
+    final centerX = GameConstants.worldWidth / 2;
+    const peakY = 18 * 32.0; // mountain peak
+    const baseHalfWidth = 4 * 32.0; // 4 tiles wide on each side at base
+
+    final vertices = [
+      Offset(centerX, peakY),                  // peak (top center)
+      Offset(centerX + baseHalfWidth, groundY), // bottom right
+      Offset(centerX - baseHalfWidth, groundY), // bottom left
+    ];
 
     return TerrainRenderer(
       groundY: groundY,
-      mountainLayers: layers,
+      mountainVertices: vertices,
     );
   }
 
@@ -60,15 +60,14 @@ class TerrainRenderer extends PositionComponent {
       groundPaint,
     );
 
-    // Mountain
+    // Mountain (smooth triangle)
     final mountainPaint = Paint()..color = const Color(0xFF795548);
-    for (final layer in mountainLayers) {
-      canvas.drawRect(layer.rect, mountainPaint);
+    final path = ui.Path();
+    path.moveTo(mountainVertices[0].dx, mountainVertices[0].dy);
+    for (var i = 1; i < mountainVertices.length; i++) {
+      path.lineTo(mountainVertices[i].dx, mountainVertices[i].dy);
     }
+    path.close();
+    canvas.drawPath(path, mountainPaint);
   }
-}
-
-class MountainLayer {
-  final Rect rect;
-  const MountainLayer({required this.rect});
 }
