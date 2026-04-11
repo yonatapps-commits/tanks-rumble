@@ -93,7 +93,7 @@ void generateArenaMap() {
       // Mountain (trapezoid shape, narrowing toward top)
       else if (y >= 18 && y < groundRow) {
         final rowFromTop = y - 18; // 0-7
-        final shrink = rowFromTop ~/ 2;
+        final shrink = (7 - rowFromTop) ~/ 2;
         final mLeft = 27 + shrink;
         final mRight = 33 - shrink;
         if (x >= mLeft && x <= mRight) {

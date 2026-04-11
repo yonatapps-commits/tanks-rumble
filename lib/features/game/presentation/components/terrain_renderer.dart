@@ -24,7 +24,7 @@ class TerrainRenderer extends PositionComponent {
     // Mountain trapezoid layers (narrowing toward top)
     final layers = <MountainLayer>[];
     for (var row = 0; row < 8; row++) {
-      final shrink = row ~/ 2;
+      final shrink = (7 - row) ~/ 2;
       final mLeft = (27 + shrink) * 32.0;
       final mRight = (33 - shrink + 1) * 32.0;
       final y = (18 + row) * 32.0;
