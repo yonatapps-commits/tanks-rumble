@@ -1,9 +1,13 @@
-import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:tanks_rumble/core/constants/game_constants.dart';
+import 'package:tanks_rumble/features/game/presentation/components/tank_component.dart';
+import 'package:tanks_rumble/features/game/presentation/game/map_loader.dart';
 
-class TankGame extends FlameGame {
+class TankGame extends FlameGame with HasCollisionDetection {
+  late TankComponent playerTank;
+  late TankComponent enemyTank;
+  late MapData mapData;
+
   @override
   Color backgroundColor() => const Color(0xFF87CEEB); // Sky blue
 
@@ -11,52 +15,37 @@ class TankGame extends FlameGame {
   Future<void> onLoad() async {
     await super.onLoad();
 
-    camera.viewfinder.visibleGameSize = Vector2(
-      GameConstants.worldWidth,
-      GameConstants.worldHeight,
-    );
-    camera.viewfinder.position = Vector2(
-      GameConstants.worldWidth / 2,
-      GameConstants.worldHeight / 2,
+    // Load Tiled map
+    mapData = await MapLoader.load('arena_01.tmx');
+
+    // Add map to world
+    world.add(mapData.tiledMap);
+
+    // Add collision shapes
+    for (final collision in mapData.collisions) {
+      world.add(collision);
+    }
+
+    // Create tanks at spawn points
+    playerTank = TankComponent(
+      team: TankTeam.player,
+      position: mapData.playerSpawn,
     );
 
-    // Placeholder ground
-    final ground = RectangleComponent(
-      position: Vector2(0, GameConstants.worldHeight * 0.75),
-      size: Vector2(GameConstants.worldWidth, GameConstants.worldHeight * 0.25),
-      paint: Paint()..color = const Color(0xFF4CAF50),
+    enemyTank = TankComponent(
+      team: TankTeam.enemy,
+      position: mapData.enemySpawn,
     );
 
-    // Placeholder mountain
-    final mountain = RectangleComponent(
-      position: Vector2(
-        GameConstants.worldWidth / 2 - 100,
-        GameConstants.worldHeight * 0.45,
-      ),
-      size: Vector2(200, GameConstants.worldHeight * 0.30),
-      paint: Paint()..color = const Color(0xFF795548),
+    world.addAll([playerTank, enemyTank]);
+
+    // Set up camera to show full map
+    final mapSize = Vector2(
+      mapData.tiledMap.width,
+      mapData.tiledMap.height,
     );
 
-    // Placeholder player tank
-    final playerTank = RectangleComponent(
-      position: Vector2(
-        150,
-        GameConstants.worldHeight * 0.75 - GameConstants.tankHeight,
-      ),
-      size: Vector2(GameConstants.tankWidth, GameConstants.tankHeight),
-      paint: Paint()..color = const Color(0xFF2196F3),
-    );
-
-    // Placeholder enemy tank
-    final enemyTank = RectangleComponent(
-      position: Vector2(
-        GameConstants.worldWidth - 150 - GameConstants.tankWidth,
-        GameConstants.worldHeight * 0.75 - GameConstants.tankHeight,
-      ),
-      size: Vector2(GameConstants.tankWidth, GameConstants.tankHeight),
-      paint: Paint()..color = const Color(0xFFF44336),
-    );
-
-    world.addAll([ground, mountain, playerTank, enemyTank]);
+    camera.viewfinder.visibleGameSize = mapSize;
+    camera.viewfinder.position = mapSize / 2;
   }
 }
