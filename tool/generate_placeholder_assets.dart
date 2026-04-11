@@ -84,7 +84,7 @@ void generateArenaMap() {
 
   for (var y = 0; y < mapHeight; y++) {
     for (var x = 0; x < mapWidth; x++) {
-      var gid = 0; // empty = transparent (sky blue background shows)
+      var gid = 1; // sky tile (fills every cell - no empty tiles = no seams)
 
       // Ground
       if (y >= groundRow) {

@@ -24,11 +24,9 @@ class MapData {
 
 class MapLoader {
   static Future<MapData> load(String mapFile) async {
-    // destTileSize slightly > 32 to overlap tiles and hide sub-pixel seams
     final tiledMap = await TiledComponent.load(
       mapFile,
-      Vector2.all(32.2),
-      useAtlas: false,
+      Vector2.all(32),
     );
 
     final objectLayer = tiledMap.tileMap.getLayer<ObjectGroup>('objects');
