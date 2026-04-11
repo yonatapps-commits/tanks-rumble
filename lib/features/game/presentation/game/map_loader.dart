@@ -1,6 +1,7 @@
-import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:flame/components.dart';
+import 'package:flutter/painting.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:tanks_rumble/features/game/presentation/components/terrain_collision.dart';
 
@@ -9,7 +10,7 @@ class MapData {
   final Vector2 playerSpawn;
   final Vector2 enemySpawn;
   final Vector2 flagPosition;
-  final Rect starZone;
+  final ui.Rect starZone;
   final List<TerrainCollision> collisions;
 
   const MapData({
@@ -27,6 +28,7 @@ class MapLoader {
     final tiledMap = await TiledComponent.load(
       mapFile,
       Vector2.all(32),
+      layerPaintFactory: (_) => Paint()..isAntiAlias = false,
     );
 
     final objectLayer = tiledMap.tileMap.getLayer<ObjectGroup>('objects');
@@ -36,7 +38,7 @@ class MapLoader {
     var playerSpawn = Vector2(150, 700);
     var enemySpawn = Vector2(1700, 700);
     var flagPosition = Vector2(960, 500);
-    var starZone = const Rect.fromLTWH(100, 64, 1720, 400);
+    var starZone = const ui.Rect.fromLTWH(100, 64, 1720, 400);
 
     if (objectLayer != null) {
       for (final obj in objectLayer.objects) {
@@ -48,7 +50,7 @@ class MapLoader {
           case 'flag_position':
             flagPosition = Vector2(obj.x, obj.y);
           case 'star_zone':
-            starZone = Rect.fromLTWH(obj.x, obj.y, obj.width, obj.height);
+            starZone = ui.Rect.fromLTWH(obj.x, obj.y, obj.width, obj.height);
         }
       }
     }
