@@ -15,6 +15,10 @@ class TankGame extends FlameGame {
       GameConstants.worldWidth,
       GameConstants.worldHeight,
     );
+    camera.viewfinder.position = Vector2(
+      GameConstants.worldWidth / 2,
+      GameConstants.worldHeight / 2,
+    );
 
     // Placeholder ground
     final ground = RectangleComponent(
