@@ -1,6 +1,8 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:tanks_rumble/core/constants/game_constants.dart';
 import 'package:tanks_rumble/features/game/presentation/components/tank_component.dart';
+import 'package:tanks_rumble/features/game/presentation/components/terrain_renderer.dart';
 import 'package:tanks_rumble/features/game/presentation/game/map_loader.dart';
 
 class TankGame extends FlameGame with HasCollisionDetection {
@@ -9,24 +11,24 @@ class TankGame extends FlameGame with HasCollisionDetection {
   late MapData mapData;
 
   @override
-  Color backgroundColor() => const Color(0xFF87CEEB); // Sky blue
+  Color backgroundColor() => const Color(0xFF87CEEB);
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
 
-    // Load Tiled map
+    // Load Tiled map for data only (spawn points, collision)
     mapData = await MapLoader.load('arena_01.tmx');
 
-    // Add map to world
-    world.add(mapData.tiledMap);
+    // Render terrain visually (no tile seams)
+    world.add(TerrainRenderer.arena());
 
-    // Add collision shapes
+    // Add collision shapes from Tiled
     for (final collision in mapData.collisions) {
       world.add(collision);
     }
 
-    // Create tanks at spawn points
+    // Create tanks at spawn points from Tiled
     playerTank = TankComponent(
       team: TankTeam.player,
       position: mapData.playerSpawn,
@@ -39,13 +41,12 @@ class TankGame extends FlameGame with HasCollisionDetection {
 
     world.addAll([playerTank, enemyTank]);
 
-    // Set up camera to show full map
-    final mapSize = Vector2(
-      mapData.tiledMap.width,
-      mapData.tiledMap.height,
+    // Camera shows full world
+    final worldSize = Vector2(
+      GameConstants.worldWidth,
+      GameConstants.worldHeight,
     );
-
-    camera.viewfinder.visibleGameSize = mapSize;
-    camera.viewfinder.position = mapSize / 2;
+    camera.viewfinder.visibleGameSize = worldSize;
+    camera.viewfinder.position = worldSize / 2;
   }
 }
