@@ -1,7 +1,6 @@
 import 'dart:ui' as ui;
 
 import 'package:flame/components.dart';
-import 'package:flutter/painting.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:tanks_rumble/features/game/presentation/components/terrain_collision.dart';
 
@@ -28,7 +27,7 @@ class MapLoader {
     final tiledMap = await TiledComponent.load(
       mapFile,
       Vector2.all(32),
-      layerPaintFactory: (_) => Paint()..isAntiAlias = false,
+      useAtlas: false,
     );
 
     final objectLayer = tiledMap.tileMap.getLayer<ObjectGroup>('objects');
