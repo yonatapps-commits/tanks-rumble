@@ -3,9 +3,11 @@ class GameConstants {
 
   // Physics
   static const double gravity = 9.8;
-  static const double maxPower = 500.0;
-  static const double minPower = 50.0;
-  static const double projectileRadius = 5.0;
+  static const double gravityMultiplier = 120.0; // world-scale gravity
+  static const double maxPower = 1800.0;
+  static const double minPower = 30.0;
+  static const double projectileRadius = 6.0;
+  static const double dragSensitivity = 6.0;
 
   // Tank
   static const int maxHearts = 3;
@@ -26,6 +28,11 @@ class GameConstants {
   static const int turnTimerSeconds = 20;
 
   // World
-  static const double worldWidth = 1920.0;
+  static const double worldWidth = 7680.0; // ×4 wider
   static const double worldHeight = 1080.0;
+
+  // Camera
+  static const double cameraViewWidth = 900.0; // zoomed in on tank
+  static const double cameraViewHeight = 500.0;
+  static const double cameraLerpSpeed = 5.0; // smooth follow speed
 }

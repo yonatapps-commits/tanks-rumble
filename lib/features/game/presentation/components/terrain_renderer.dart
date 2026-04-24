@@ -18,19 +18,17 @@ class TerrainRenderer extends PositionComponent {
           size: Vector2(GameConstants.worldWidth, GameConstants.worldHeight),
         );
 
-  /// Creates the default arena terrain.
+  /// Creates the default arena terrain - same style, scaled for wide map.
   factory TerrainRenderer.arena() {
-    const groundY = 26 * 32.0; // row 26 = ground start
+    const groundY = 880.0;
+    final centerX = GameConstants.worldWidth / 2; // 3840
 
-    // Smooth triangle mountain
-    final centerX = GameConstants.worldWidth / 2;
-    const peakY = 18 * 32.0; // mountain peak
-    const baseHalfWidth = 4 * 32.0; // 4 tiles wide on each side at base
-
+    // Single massive triangle mountain in center
+    // ~40% of map width base, peak at ~20% from top
     final vertices = [
-      Offset(centerX, peakY),                  // peak (top center)
-      Offset(centerX + baseHalfWidth, groundY), // bottom right
-      Offset(centerX - baseHalfWidth, groundY), // bottom left
+      Offset(centerX, 180),                // peak
+      Offset(centerX + 1400, groundY),     // bottom right
+      Offset(centerX - 1400, groundY),     // bottom left
     ];
 
     return TerrainRenderer(
@@ -41,24 +39,17 @@ class TerrainRenderer extends PositionComponent {
 
   @override
   void render(Canvas canvas) {
-    // Sky background
-    final skyPaint = Paint()..color = const Color(0xFF87CEEB);
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, GameConstants.worldWidth, groundY),
-      skyPaint,
-    );
+    final w = GameConstants.worldWidth;
+    // Extra padding so camera never shows empty space
+    const pad = 500.0;
 
-    // Ground
+    // Sky - extends far above
+    final skyPaint = Paint()..color = const Color(0xFF87CEEB);
+    canvas.drawRect(Rect.fromLTWH(-pad, -pad, w + pad * 2, groundY + pad), skyPaint);
+
+    // Ground - extends far below
     final groundPaint = Paint()..color = const Color(0xFF4CAF50);
-    canvas.drawRect(
-      Rect.fromLTWH(
-        0,
-        groundY,
-        GameConstants.worldWidth,
-        GameConstants.worldHeight - groundY,
-      ),
-      groundPaint,
-    );
+    canvas.drawRect(Rect.fromLTWH(-pad, groundY, w + pad * 2, pad * 2), groundPaint);
 
     // Mountain (smooth triangle)
     final mountainPaint = Paint()..color = const Color(0xFF795548);
